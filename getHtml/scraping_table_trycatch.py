@@ -7,7 +7,7 @@ import urllib2
 from bs4 import BeautifulSoup
 
 
-years = range(1993,2018)
+years = range(1992,2018)
 ids = range(1,4)
 
 for id in ids:
@@ -30,7 +30,9 @@ for id in ids:
 						#print type(cell.get_text())
 						#csvRow.append(cell.encode('shift_jis'))
 						try:
-							csvRowText.append(cell.get_text().encode('shift_jis'))
+							tmp = cell.get_text().encode('shift_jis').strip()
+							csvRowText.append(tmp)
+							#csvRowText.append(cell.get_text().encode('shift_jis'))
 						except UnicodeEncodeError:
 							csvRowText.append("")
 					writer.writerow(csvRowText)
