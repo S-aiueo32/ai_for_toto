@@ -32,7 +32,7 @@ for id in ids:
 						try:
 							csvRowText.append(cell.get_text().encode('shift_jis'))
 						except UnicodeEncodeError:
-							pass
+							csvRowText.append("")
 					writer.writerow(csvRowText)
 			finally:
 				csvFile.close()
