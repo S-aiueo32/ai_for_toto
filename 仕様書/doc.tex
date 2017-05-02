@@ -44,36 +44,13 @@
 \date{2017/05/09}
 \author{14EC020 内田奏 \and 14EC052 小林将輝 \and 14EC086 中村文香}
 
-%「jlisting.sty」が必要
-\usepackage{listings,jlisting}
-\def\lstlistingname{リスト}	%キャプションの設定
-\lstset{%
-language={Java},
-basicstyle={\small},%
-identifierstyle={\small},%
-commentstyle={\small\itshape},%
-keywordstyle={\small\bfseries},%
-ndkeywordstyle={\small},%
-stringstyle={\small\ttfamily},
-frame={tb},
-breaklines=true,
-columns=[l]{fullflexible},%
-numbers=left,%
-xrightmargin=0zw,%
-xleftmargin=3zw,%
-numberstyle={\scriptsize},%
-stepnumber=1,
-numbersep=1zw,%
-lineskip=-0.5ex%
-}
-
 \begin{document}
 \maketitle
 \thispagestyle{fancy}
 \section{概要}
 サッカーくじ toto は，独立行政法人日本スポーツ振興センターにより運営・発売が行われている公営ギャンブルである．
 totoは国内外で行われるサッカーの試合を対象とし，購入者は勝ち，負け，引き分けを予想する．
-ここでは，totoの主要な対象であるＪリーグの試合結果をもとに，ディープラーニングフレームワークを用いてこの目を予想する．
+ここでは，totoの主要な対象であるＪリーグの試合結果をもとに，ニューラルネットワークを用いてこの目を予想する．
 
 \section{収集・使用するデータ}
 Jリーグの試合結果はすべてＪリーグ公式のデータサイト(https://data.j-league.or.jp/SFTP01/)より取得可能である．
