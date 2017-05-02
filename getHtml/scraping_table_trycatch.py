@@ -2,7 +2,7 @@ import csv
 import urllib2
 from bs4 import BeautifulSoup
 
-for year in range(2014,2017):
+for year in range(2014,2018):
 	html = urllib2.urlopen("https://data.j-league.or.jp/SFMS01/search?competition_years=" + str(year) + "&competition_frame_ids=3&tv_relay_station_name=")
 
 	bsObj = BeautifulSoup(html, "html.parser")
