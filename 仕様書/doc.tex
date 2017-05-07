@@ -1,97 +1,118 @@
-\documentclass[9pt]{jsarticle}
-%\usepackage{otf} %Windows上ではコメントアウト
-\usepackage{amsmath, amssymb}
-\usepackage[dvipdfmx]{graphics,xcolor}
-\usepackage{tikz}
-\usepackage[framemethod=tikz]{mdframed}
-\usepackage{type1cm}
-\usepackage{graphicx}
-\usepackage{float}
-\usepackage{here}
-\usepackage{fancyhdr}
-\usepackage{lscape} %ページ全体を用いた横向き画像使用時に使用
+\documentclass[twocolumn,10pt]{jarticle} 
+\usepackage[dvipdfmx]{graphicx, color}
+\usepackage[top=15truemm,bottom=20truemm,left=20truemm,right=20truemm]{geometry}
+\setlength{\columnsep}{3zw} 
+\usepackage[labelsep=period]{caption} 
+%\pagestyle{empty}
 
-%マージン設定
-%横
-\setlength{\textwidth}{165truemm}
-\setlength{\hoffset}{-1truein}
-\setlength{\oddsidemargin}{25truemm}
-%縦
-\setlength{\textheight}{257truemm}
-\setlength{\voffset}{-1truein}
-\setlength{\topmargin}{10truemm}
-\setlength{\headheight}{5truemm}
-\setlength{\headsep}{5truemm}
 
-%ページ番号設定
-\pagestyle{fancy}
-\fancyhead[RE]{}
-\fancyhead[RO]{\thepage}
-\fancyhead[LE]{\thepage}
-\fancyhead[LO]{}
-\cfoot{}
-\renewcommand{\headrulewidth}{0pt}
+\makeatletter
+\def\section{\@startsection {section}{1}{\z@}%
+{2.5ex \@plus -1ex \@minus -.2ex}%
+{1ex \@plus.1ex}%
+{\sectionformat}}
+\def\sectionformat{\normalsize\bf}
 
-%図表番号設定
-%「図4.4.1」みたいにしたかったらsectionをsubsectionに変える
 
-%箇条書き表示設定
-\renewcommand{\labelenumi}{(\arabic{enumi})}%第1階層
-\renewcommand{\labelenumii}{(\roman{enumii})}%第2階層
+\def\@maketitle{% 
+ \begin{flushright}% 
+ {\@date}% 日付 
+\end{flushright}% 
+ \begin{center}% 
+ {\LARGE \@title \par}% タイトル 
+\end{center}% 
+ \begin{flushright}% 
+ {\large \@author}% 著者 
+\end{flushright}% 
+ \par\vskip 1.5em
+ }
+\makeatother
 
-%タイトル設定
-\title{4EC 情報通信プロジェクト データ解析\\ 人工知能によるサッカーくじ予想}
-\date{2017/05/09}
-\author{14EC020 内田奏 \and 14EC052 小林将輝 \and 14EC086 中村文香}
 
+\title{\Large 情報通信プロジェクト データ解析\\ -人工知能によるサッカーくじ予想-} 
+\vspace{-1zh}
+\author{\normalsize14EC020 内田奏\\14EC052 小林将輝\\14EC086 中村文香} 
+\vspace{-1zh}
+\date{2017年5月9日（火）}
 \begin{document}
 \maketitle
-\thispagestyle{fancy}
 \section{概要}
 サッカーくじ toto は，独立行政法人日本スポーツ振興センターにより運営・発売が行われている公営ギャンブルである．
 totoは国内外で行われるサッカーの試合を対象とし，購入者は勝ち，負け，引き分けを予想する．
-ここでは，totoの主要な対象であるＪリーグの試合結果をもとに，ニューラルネットワークを用いてこの目を予想する．
+主要な対象は国内リーグのＪリーグであり，対象試合にはJ1・J2・J3の最大28試合のうち13試合が選ばれる．
+ここでは，過去のＪリーグの試合結果をもとに，勝ち，負け，引き分けを予測する．
 
 \section{収集・使用するデータ}
-Jリーグの試合結果はすべてＪリーグ公式のデータサイト(https://data.j-league.or.jp/SFTP01/)より取得可能である．
-取得したデータから勝ち点，順位等を計算し，それらを入力データとする．
-データ収集・整形の分担は次を予定している．
+Jリーグの試合結果はすべてJリーグ公式のデータサイト(https://data.j-league.or.jp)より取得可能である．
+取得したデータを整形し，それらを入力データとする．
+データ収集・整形の分担は表\ref{data}を予定している．
 \begin{table}[htbp]
 \centering
-\caption{データ収集・整形 分担表} \label{Equipments}
+\caption{データ収集・整形 分担表} \label{data}
 \begin{tabular}{cc} 
 \hline
-役割&担当者\\\hline\hline
+\textbf{役割}&\textbf{担当者}\\\hline
 データ収集&内田\\
 データ整形&小林・中村\\\hline
 \end{tabular}
 \end{table}
 
+Jリーグは，totoが開始された2000年に初めて引き分けを導入し，1999年以前は延長戦およびPK戦により勝敗を決していた．
+また，2000年から2002年に導入された引き分けは，延長戦でVゴールが記録されなかった場合にのみ適用されるものであった．
+現在では，いかなる場合においても延長戦は行わない．
+このように試合方式に相違があるが，ここでは次のように勝ち，負け，引き分けを定義する．
+\begin{itemize}
+\item{1999年以前の試合結果について}
+\begin{itemize}
+\item{90分及び延長での得点を勝敗として採用する．}
+\item{PK戦に突入した試合は，PK戦の結果にかかわらず引き分けとする．}
+\end{itemize}
+\item{2000年から2002年の試合結果について}
+\begin{itemize}
+\item{公式記録の勝敗を採用する．}
+\item{Vゴールによる勝利も勝利とする．}
+\end{itemize}
+\item{2003年以降の試合結果について}
+\begin{itemize}
+\item{公式記録の勝敗を採用する．}
+\end{itemize}
+\end{itemize}
+これによる勝ち点等公式記録との差異は今回考慮しない．
+
+リーグ方式については，全年度1ステージ制であると仮定し，2ステージ制によるリーグの動向やプレーオフ等については考慮しない．
+
 \section{使用するツール}
+学習にはニューラルネットワークを用いる．
+ニューラルネットワークを用いたディープラーニングフレームワークおよびツールは多くリリースされているが，
+今回は次のフレームワークを用いることを考えている．
 \begin{itemize}
-\item{ディープラーニングフレームワーク}
-\begin{itemize}
-\item{Chainer}
 \item{TensorFlow}
-\item{Caffe2}
-\end{itemize}
-\item{プログラミング言語}
-\begin{itemize}
-\item{Python}
-\end{itemize}
+
+時系列データの学習に長けたリカレントニューラルネットワーク(RNN)及びLSTMについてのドキュメントや実装例が比較的豊富．
+
+\item{Chainer}
+
+Pythonによる実装が可能．
+
+\item{NVIDIA DIGITS}
+
+CaffeをラップしてGUIで使用可能．画像分類のための知識が筆者に多少ある．
+
 \end{itemize}
 
-\section{工程表}
+\section{工程}
+作業工程については，表\ref{process}のスケジュールを予定している．
 \begin{table}[htbp]
 \centering
-\caption{工程表(予定)} \label{Equipments}
+\caption{工程表(予定)} \label{process}
 \begin{tabular}{cc} 
 \hline
-作業項目&時期\\\hline\hline
+\textbf{作業項目}&\textbf{時期}\\\hline
 データ収集&5月中\\
 データ整形&6月中\\
 シミュレータ作成&7月中\\
-ネットワーク作成&8月以降\\\hline
+ネットワーク作成&8月中\\
+シミュレーション実行&上記が終わり次第\\\hline
 \end{tabular}
 \end{table}
 
